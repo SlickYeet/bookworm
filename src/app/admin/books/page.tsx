@@ -1,3 +1,4 @@
+import { CirclePlusIcon } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -9,7 +10,7 @@ export default function BooksPage() {
         <h2 className="text-lg font-semibold">All Books</h2>
         <Button className="bg-primary-admin" asChild>
           <Link href="/admin/books/new" className="text-white">
-            + Create a New Book
+            <CirclePlusIcon /> Create a New Book
           </Link>
         </Button>
       </div>

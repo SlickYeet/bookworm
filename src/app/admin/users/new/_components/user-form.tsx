@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -36,6 +37,8 @@ export function UserForm() {
       studentId: "",
     },
   })
+
+  const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
     const result = await createUser(values)
@@ -159,7 +162,12 @@ export function UserForm() {
           />
         </div>
 
-        <Button type="submit" className="book-form_btn text-white">
+        <Button
+          disabled={isLoading}
+          type="submit"
+          className="book-form_btn text-white"
+        >
+          {isLoading ? <Loader2 className="animate-spin" /> : null}
           Create User
         </Button>
       </form>

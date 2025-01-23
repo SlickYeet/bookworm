@@ -11,8 +11,8 @@ export default function SignInPage() {
       type="SIGN_IN"
       schema={SignInSchema}
       defaultValues={{
-        email: "",
-        password: "",
+        email: "test@famlam.ca",
+        password: "Password1234!",
       }}
       onSubmit={signIn}
     />

@@ -1,3 +1,4 @@
+import { CirclePlusIcon } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -9,7 +10,7 @@ export default function UsersPage() {
         <h2 className="text-lg font-semibold">All Users</h2>
         <Button className="bg-primary-admin" asChild>
           <Link href="/admin/users/new" className="text-white">
-            + Create a New User
+            <CirclePlusIcon /> Create a New User
           </Link>
         </Button>
       </div>

@@ -2,9 +2,11 @@
 
 import type { Book, BORROW_STATUS, BorrowRecord } from "@prisma/client"
 import dayjs from "dayjs"
+import { z } from "zod"
 
 import { db } from "@/server/db"
 import { ReturnType } from "@/types"
+import { AccountRequestSchema } from "@/validators"
 
 export async function createBook(
   params: BookParams,
@@ -105,6 +107,55 @@ export async function borrowBook(
       success: false,
       message: "An error occurred while trying to borrow the book",
       key: "borrow_book_error",
+      data: null,
+    }
+  }
+}
+
+export async function manageAccountRequest(
+  values: z.infer<typeof AccountRequestSchema>,
+) {
+  try {
+    const { userId, status } = values
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+    })
+    if (user === null) {
+      return {
+        success: false,
+        message: "User not found",
+        key: "user_not_found",
+        data: null,
+      }
+    }
+
+    if (status === "APPROVED") {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          status,
+        },
+      })
+
+      // send email to user with `message`
+    } else if (status === "REJECTED") {
+      // send email to user with `message`
+    }
+
+    return {
+      success: true,
+      message: "Account request has been submitted successfully",
+      key: "manage_account_request_success",
+      data: null,
+    }
+  } catch (error) {
+    console.error(error)
+
+    return {
+      success: false,
+      message: "An error occurred while trying to manage the account request",
+      key: "manage_account_request_error",
       data: null,
     }
   }

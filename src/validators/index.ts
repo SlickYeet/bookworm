@@ -1,4 +1,4 @@
-import { BORROW_STATUS } from "@prisma/client"
+import { BORROW_STATUS, STATUS } from "@prisma/client"
 import { z } from "zod"
 
 export const SignUpSchema = z.object({
@@ -37,4 +37,10 @@ export const BorrowRecordSchema = z.object({
   borrowDate: z.date(),
   dueDate: z.date(),
   returnDate: z.date().nullable(),
+})
+
+export const AccountRequestSchema = z.object({
+  userId: z.string(),
+  status: z.nativeEnum(STATUS),
+  message: z.string().optional(),
 })

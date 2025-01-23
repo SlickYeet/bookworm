@@ -4,7 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { BORROW_STATUS, type Book, type User } from "@prisma/client"
 import { format } from "date-fns"
 import dayjs from "dayjs"
-import { CalendarIcon, CheckIcon, ChevronsDownIcon } from "lucide-react"
+import {
+  CalendarIcon,
+  CheckIcon,
+  ChevronsDownIcon,
+  Loader2,
+} from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -68,6 +73,8 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
       returnDate: null,
     },
   })
+
+  const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof BorrowRecordSchema>) => {
     const result = await borrowBook(values)
@@ -340,10 +347,13 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-col gap-1">
               <FormLabel className="text-base font-normal text-dark-500">
-                Returned Date (Optional)
+                Returned Date
               </FormLabel>
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger
+                  disabled={form.watch("status") !== "RETURNED"}
+                  asChild
+                >
                   <FormControl>
                     <Button
                       variant="outline"
@@ -375,7 +385,12 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
           )}
         />
 
-        <Button type="submit" className="book-form_btn text-white">
+        <Button
+          disabled={isLoading}
+          type="submit"
+          className="book-form_btn text-white"
+        >
+          {isLoading ? <Loader2 className="animate-spin" /> : null}
           Add Book to Library
         </Button>
       </form>

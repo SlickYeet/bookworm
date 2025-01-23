@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { BookSchema } from "@/validators"
 
+import { Loader2 } from "lucide-react"
 import { ColorPicker } from "./color-picker"
 
 // interface BookFormProps extends Partial<Book> {
@@ -45,6 +46,8 @@ export function BookForm() {
       summary: "",
     },
   })
+
+  const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof BookSchema>) => {
     const result = await createBook(values)
@@ -275,7 +278,12 @@ export function BookForm() {
           )}
         />
 
-        <Button type="submit" className="book-form_btn text-white">
+        <Button
+          disabled={isLoading}
+          type="submit"
+          className="book-form_btn text-white"
+        >
+          {isLoading ? <Loader2 className="animate-spin" /> : null}
           Add Book to Library
         </Button>
       </form>
