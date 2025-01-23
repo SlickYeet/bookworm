@@ -1,5 +1,6 @@
 "use client"
 
+import dayjs from "dayjs"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -35,8 +36,19 @@ export function BorrowBook({
 
     setBorrowing(true)
 
+    const borrowDate = new Date()
+    const dueDate = dayjs().add(30, "day").toDate()
+    const returnDate = null
+
     try {
-      const result = await borrowBook({ bookId, userId })
+      const result = await borrowBook({
+        bookId,
+        userId,
+        status: "BORROWED",
+        borrowDate,
+        dueDate,
+        returnDate,
+      })
       if (result.success) {
         toast.success("Success!", {
           description: "You can find the book under 'Borrowed Books'. Enjoy!",
