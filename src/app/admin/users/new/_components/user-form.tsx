@@ -17,8 +17,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { createUser } from "@/server/user"
 import { SignUpSchema } from "@/validators"
+
+import { adminCreateUser } from "./action"
 
 // interface UserFormProps extends Partial<Book> {
 //   type?: "create" | "update"
@@ -41,7 +42,7 @@ export function UserForm() {
   const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
-    const result = await createUser(values)
+    const result = await adminCreateUser(values)
     if (result) {
       toast.success("User created successfully!")
 

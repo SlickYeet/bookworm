@@ -1,9 +1,24 @@
 import { CirclePlusIcon } from "lucide-react"
 import Link from "next/link"
 
+import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
+import { db } from "@/server/db"
 
-export default function BorrowRecordsPage() {
+import { column } from "./_components/columns"
+
+export default async function BorrowRecordsPage() {
+  const borrowRecords = await db.borrowRecord.findMany()
+  const userIds = borrowRecords.map((record) => record.userId)
+  const users = await db.user.findMany({
+    where: { id: { in: userIds } },
+  })
+
+  const data = borrowRecords.map((record) => ({
+    ...record,
+    user: users.find((user) => user.id === record.userId),
+  }))
+
   return (
     <section className="w-full rounded-2xl bg-white p-7">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -16,7 +31,7 @@ export default function BorrowRecordsPage() {
       </div>
 
       <div className="mt-7 w-full overflow-hidden">
-        <p>Table</p>
+        <DataTable columns={column} data={data} />
       </div>
     </section>
   )

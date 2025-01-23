@@ -81,7 +81,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
     if (result.success) {
       toast.success(result.message)
 
-      router.push(`/admin/book/${result.data?.id}`)
+      router.push("/admin/books")
     } else {
       toast.error("Oops! Something went wrong.", {
         description: result.message,
@@ -327,7 +327,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
                       selected={field.value ?? undefined}
                       onSelect={field.onChange}
                       disabled={(date) =>
-                        date <= form.watch("borrowDate") ||
+                        date <= (form.watch("borrowDate") ?? new Date()) ||
                         date < new Date("1900-01-01")
                       }
                       initialFocus

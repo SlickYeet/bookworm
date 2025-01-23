@@ -54,7 +54,7 @@ export function BookForm() {
     if (result.success) {
       toast.success(result.message)
 
-      router.push(`/admin/book/${result.data?.id}`)
+      router.push("/admin/books")
     } else {
       toast.error("Oops! Something went wrong.", {
         description: result.message,

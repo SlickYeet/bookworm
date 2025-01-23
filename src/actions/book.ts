@@ -1,21 +1,25 @@
 "use server"
 
-import type { Book, BORROW_STATUS, BorrowRecord } from "@prisma/client"
+import type { Book, BorrowRecord } from "@prisma/client"
 import dayjs from "dayjs"
 import { z } from "zod"
 
 import { db } from "@/server/db"
 import { ReturnType } from "@/types"
-import { AccountRequestSchema } from "@/validators"
+import {
+  AccountRequestSchema,
+  BookSchema,
+  BorrowRecordSchema,
+} from "@/validators"
 
 export async function createBook(
-  params: BookParams,
+  values: z.infer<typeof BookSchema>,
 ): Promise<ReturnType<Book>> {
   try {
     const newBook = await db.book.create({
       data: {
-        ...params,
-        availableCopies: params.totalCopies,
+        ...values,
+        availableCopies: values.totalCopies,
       },
     })
 
@@ -37,19 +41,10 @@ export async function createBook(
   }
 }
 
-interface BorrowBookParams {
-  bookId: string
-  userId: string
-  status?: BORROW_STATUS
-  borrowDate?: Date
-  dueDate?: Date
-  returnDate?: Date | null
-}
-
 export async function borrowBook(
-  params: BorrowBookParams,
+  values: z.infer<typeof BorrowRecordSchema>,
 ): Promise<ReturnType<BorrowRecord>> {
-  const { bookId, userId, status, borrowDate, dueDate, returnDate } = params
+  const { bookId, userId, status, borrowDate, dueDate, returnDate } = values
 
   try {
     const book = await db.book.findUnique({
@@ -158,5 +153,33 @@ export async function manageAccountRequest(
       key: "manage_account_request_error",
       data: null,
     }
+  }
+}
+
+export async function updateBorrowRecord(
+  values: z.infer<typeof BorrowRecordSchema>,
+): Promise<ReturnType<BorrowRecord>> {
+  const existingRecord = await db.borrowRecord.findFirst({
+    where: { userId: values.userId, bookId: values.bookId },
+  })
+  if (existingRecord === null) {
+    return {
+      success: false,
+      message: "Borrow record not found",
+      key: "borrow_record_not_found",
+      data: null,
+    }
+  }
+
+  const updatedRecord = await db.borrowRecord.update({
+    where: { id: existingRecord.id },
+    data: { ...values },
+  })
+
+  return {
+    success: true,
+    message: "Borrow record has been successfully updated",
+    key: "update_borrow_record_success",
+    data: JSON.parse(JSON.stringify(updatedRecord)),
   }
 }

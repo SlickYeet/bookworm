@@ -33,9 +33,9 @@ export const BookSchema = z.object({
 export const BorrowRecordSchema = z.object({
   userId: z.string(),
   bookId: z.string(),
-  status: z.nativeEnum(BORROW_STATUS),
-  borrowDate: z.date(),
-  dueDate: z.date(),
+  status: z.nativeEnum(BORROW_STATUS).optional(),
+  borrowDate: z.date().optional(),
+  dueDate: z.date().optional(),
   returnDate: z.date().nullable(),
 })
 
