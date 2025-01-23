@@ -327,7 +327,8 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
                       selected={field.value ?? undefined}
                       onSelect={field.onChange}
                       disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
+                        date <= form.watch("borrowDate") ||
+                        date < new Date("1900-01-01")
                       }
                       initialFocus
                     />
