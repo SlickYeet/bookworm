@@ -1,0 +1,91 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider     = "postgresql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+enum STATUS {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+enum ROLE {
+    STUDENT
+    ADMIN
+}
+
+model User {
+    id String @id @default(uuid())
+
+    fullName String
+    email    String @unique
+    password String
+
+    status       STATUS   @default(PENDING)
+    role         ROLE     @default(STUDENT)
+    lastActiveAt DateTime @default(now())
+
+    universityId Int    @unique
+    studentId    String
+
+    sessions Session[]
+
+    createdAt DateTime @default(now())
+}
+
+model Session {
+    id String @id
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+
+    @@index([userId])
+}
+
+model Book {
+    id String @id @default(uuid())
+
+    title       String
+    description String @db.Text
+    author      String
+    genre       String
+    rating      Float
+    summary     String @db.Text
+
+    coverColor String @db.VarChar(7)
+    coverUrl   String
+    videoUrl   String
+
+    totalCopies     Int @default(1)
+    availableCopies Int @default(0)
+
+    createdAt DateTime @default(now())
+}
+
+enum BORROW_STATUS {
+    BORROWED
+    RETURNED
+}
+
+model BorrowRecord {
+    id String @id @default(uuid())
+
+    userId String
+    bookId String
+
+    status BORROW_STATUS @default(BORROWED)
+
+    borrowDate DateTime  @default(now())
+    dueDate    DateTime
+    returnDate DateTime?
+
+    createdAt DateTime @default(now())
+}
