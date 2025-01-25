@@ -5,9 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { adminSideBarLinks } from "@/constants"
-import { cn, getInitials } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+
+import { UserInfo } from "./user-info"
 
 export function Sidebar({ user }: { user: User }) {
   const pathname = usePathname()
@@ -60,16 +61,7 @@ export function Sidebar({ user }: { user: User }) {
       </div>
 
       <div className="user">
-        <Avatar>
-          <AvatarFallback className="bg-amber-100">
-            {getInitials(user.fullName)}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex flex-col max-md:hidden">
-          <p className="font-semibold text-dark-200">{user.fullName}</p>
-          <p className="text-xs text-light-500">{user.email}</p>
-        </div>
+        <UserInfo user={user} />
       </div>
     </div>
   )

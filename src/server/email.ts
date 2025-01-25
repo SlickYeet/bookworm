@@ -1,28 +1,13 @@
-import { Client as QStashClient, resend } from "@upstash/qstash"
-import { Client as WorkflowClient } from "@upstash/workflow"
+"use server"
+
+import { STATUS } from "@prisma/client"
+import { resend } from "@upstash/qstash"
 
 import { emailRenderer, EmailTemplates } from "@/components/email-renderer"
 import { env } from "@/config"
 import { db } from "@/server/db"
 
-export async function checkEmailAvailability(email: string): Promise<boolean> {
-  const user = await db.user.findUnique({
-    where: { email },
-  })
-  if (user === null) {
-    return true
-  }
-  return false
-}
-
-export const workflowClient = new WorkflowClient({
-  baseUrl: env.upstash.qStash.url,
-  token: env.upstash.qStash.token,
-})
-
-const qStashClient = new QStashClient({
-  token: env.upstash.qStash.token,
-})
+import { qStashClient } from "./workflow"
 
 export async function sendEmail({
   email,
@@ -48,7 +33,29 @@ export async function sendEmail({
       from: `HHN BookWorm <${env.resend.emailUser}>`,
       to: [email],
       subject,
-      html: body,
+      body,
     },
   })
+}
+
+export async function checkEmailAvailability(email: string): Promise<boolean> {
+  const user = await db.user.findUnique({
+    where: { email },
+  })
+  if (user === null) {
+    return true
+  }
+  return false
+}
+
+export async function checkEmailIsVerified(email: string): Promise<STATUS> {
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { status: true },
+  })
+  if (user === null) {
+    throw new Error("User not found")
+  }
+
+  return user.status
 }

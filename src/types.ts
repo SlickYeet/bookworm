@@ -1,4 +1,4 @@
-export type ReturnType<T> = {
+export type ReturnType<T = undefined> = {
   success: boolean
   message: string
   key: string

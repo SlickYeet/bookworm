@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -21,12 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { BookSchema } from "@/validators"
 
-import { Loader2 } from "lucide-react"
 import { ColorPicker } from "./color-picker"
-
-// interface BookFormProps extends Partial<Book> {
-//   type?: "create" | "update"
-// }
 
 export function BookForm() {
   const router = useRouter()
@@ -65,6 +61,7 @@ export function BookForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* title */}
         <FormField
           control={form.control}
           name="title"
@@ -86,6 +83,7 @@ export function BookForm() {
           )}
         />
         <div className="flex gap-8">
+          {/* author */}
           <FormField
             control={form.control}
             name="author"
@@ -106,6 +104,7 @@ export function BookForm() {
               </FormItem>
             )}
           />
+          {/* genre */}
           <FormField
             control={form.control}
             name="genre"
@@ -128,6 +127,7 @@ export function BookForm() {
           />
         </div>
         <div className="flex gap-8">
+          {/* rating */}
           <FormField
             control={form.control}
             name="rating"
@@ -150,6 +150,7 @@ export function BookForm() {
               </FormItem>
             )}
           />
+          {/* totalCopies */}
           <FormField
             control={form.control}
             name="totalCopies"
@@ -173,6 +174,7 @@ export function BookForm() {
             )}
           />
         </div>
+        {/* coverUrl */}
         <FormField
           control={form.control}
           name="coverUrl"
@@ -194,6 +196,7 @@ export function BookForm() {
             </FormItem>
           )}
         />
+        {/* coverColor */}
         <FormField
           control={form.control}
           name="coverColor"
@@ -212,6 +215,7 @@ export function BookForm() {
             </FormItem>
           )}
         />
+        {/* description */}
         <FormField
           control={form.control}
           name="description"
@@ -233,6 +237,7 @@ export function BookForm() {
             </FormItem>
           )}
         />
+        {/* videoUrl */}
         <FormField
           control={form.control}
           name="videoUrl"
@@ -256,6 +261,7 @@ export function BookForm() {
             </FormItem>
           )}
         />
+        {/* summary */}
         <FormField
           control={form.control}
           name="summary"

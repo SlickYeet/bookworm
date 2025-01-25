@@ -1,27 +1,26 @@
 "use server"
 
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+
+import { ratelimit } from "@/lib/ratelimit"
 import {
   deleteSessionTokenCookie,
   getSession,
   invalidateSession,
 } from "@/server/session"
-import { ReturnType } from "@/types"
 
-export async function signOut(): Promise<ReturnType<null>> {
+export async function signOut(): Promise<void> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
   const { session } = await getSession()
   if (session === null) {
-    return {
-      success: false,
-      message: "Not authenticated",
-      key: "not_authenticated",
-    }
+    throw new Error("No session found")
   }
   await invalidateSession(session.id)
   deleteSessionTokenCookie()
 
-  return {
-    success: true,
-    message: "Signed out",
-    key: "signed_out",
-  }
+  return redirect("/sign-in")
 }

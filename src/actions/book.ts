@@ -2,9 +2,15 @@
 
 import type { Book, BorrowRecord } from "@prisma/client"
 import dayjs from "dayjs"
+import { revalidatePath } from "next/cache"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { z } from "zod"
 
+import { ratelimit } from "@/lib/ratelimit"
 import { db } from "@/server/db"
+import { checkEmailIsVerified } from "@/server/email"
+import { getSession } from "@/server/session"
 import { ReturnType } from "@/types"
 import {
   AccountRequestSchema,
@@ -15,6 +21,10 @@ import {
 export async function createBook(
   values: z.infer<typeof BookSchema>,
 ): Promise<ReturnType<Book>> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
   try {
     const newBook = await db.book.create({
       data: {
@@ -44,6 +54,39 @@ export async function createBook(
 export async function borrowBook(
   values: z.infer<typeof BorrowRecordSchema>,
 ): Promise<ReturnType<BorrowRecord>> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
+  const { user } = await getSession()
+  if (user === null) {
+    return {
+      success: false,
+      message: "Unauthorized",
+      key: "unauthorized",
+      data: null,
+    }
+  }
+
+  const userStatus = await checkEmailIsVerified(user.email)
+  if (userStatus === "REJECTED") {
+    return {
+      success: false,
+      message:
+        "Your account request has been rejected. Please contact support.",
+      key: "account_rejected",
+      data: null,
+    }
+  }
+  if (userStatus !== "APPROVED") {
+    return {
+      success: false,
+      message: "Your account is not yet approved",
+      key: "account_not_approved",
+      data: null,
+    }
+  }
+
   const { bookId, userId, status, borrowDate, dueDate, returnDate } = values
 
   try {
@@ -107,9 +150,47 @@ export async function borrowBook(
   }
 }
 
+export async function updateBorrowRecord(
+  values: z.infer<typeof BorrowRecordSchema>,
+): Promise<ReturnType<BorrowRecord>> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
+  const existingRecord = await db.borrowRecord.findFirst({
+    where: { userId: values.userId, bookId: values.bookId },
+  })
+  if (existingRecord === null) {
+    return {
+      success: false,
+      message: "Borrow record not found",
+      key: "borrow_record_not_found",
+      data: null,
+    }
+  }
+
+  const updatedRecord = await db.borrowRecord.update({
+    where: { id: existingRecord.id },
+    data: { ...values },
+  })
+
+  revalidatePath("/admin/borrow-records")
+
+  return {
+    success: true,
+    message: "Borrow record has been successfully updated",
+    key: "update_borrow_record_success",
+    data: JSON.parse(JSON.stringify(updatedRecord)),
+  }
+}
+
 export async function manageAccountRequest(
   values: z.infer<typeof AccountRequestSchema>,
 ) {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
   try {
     const { userId, status } = values
 
@@ -153,33 +234,5 @@ export async function manageAccountRequest(
       key: "manage_account_request_error",
       data: null,
     }
-  }
-}
-
-export async function updateBorrowRecord(
-  values: z.infer<typeof BorrowRecordSchema>,
-): Promise<ReturnType<BorrowRecord>> {
-  const existingRecord = await db.borrowRecord.findFirst({
-    where: { userId: values.userId, bookId: values.bookId },
-  })
-  if (existingRecord === null) {
-    return {
-      success: false,
-      message: "Borrow record not found",
-      key: "borrow_record_not_found",
-      data: null,
-    }
-  }
-
-  const updatedRecord = await db.borrowRecord.update({
-    where: { id: existingRecord.id },
-    data: { ...values },
-  })
-
-  return {
-    success: true,
-    message: "Borrow record has been successfully updated",
-    key: "update_borrow_record_success",
-    data: JSON.parse(JSON.stringify(updatedRecord)),
   }
 }

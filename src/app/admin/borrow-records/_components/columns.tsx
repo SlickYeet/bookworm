@@ -2,21 +2,21 @@
 
 import type { BorrowRecord, User } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
+import { format } from "date-fns"
 
-import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "@/components/data-table/column-header"
+import { Checkbox } from "@/components/ui/checkbox"
 
 import { BookIdCell } from "./book-id-cell"
+import { RowActions } from "./row-actions"
 import { StatusCell } from "./status-cell"
 import { UserCell } from "./user-cell"
-import { format } from "date-fns"
-import { RowActions } from "./row-actions"
 
-export type ColumnType = {
-  user: User | undefined
+export type BorrowRecordWithUser = {
+  user: User
 } & BorrowRecord
 
-export const column: ColumnDef<ColumnType>[] = [
+export const column: ColumnDef<BorrowRecordWithUser>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -44,8 +44,7 @@ export const column: ColumnDef<ColumnType>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="User" />
     ),
-    cell: ({ row }) =>
-      row.original.user && <UserCell user={row.original.user} />,
+    cell: ({ row }) => <UserCell user={row.original.user} />,
     enableHiding: false,
   },
   {
@@ -69,7 +68,7 @@ export const column: ColumnDef<ColumnType>[] = [
     ),
     cell: ({ row }) => {
       const date = row.original.borrowDate
-      return date ? format(new Date(date), "dd/MM/yyyy HH:mm") : "N/A"
+      return date ? format(new Date(date), "MM/dd/yyyy") : "N/A"
     },
   },
   {
@@ -79,7 +78,7 @@ export const column: ColumnDef<ColumnType>[] = [
     ),
     cell: ({ row }) => {
       const date = row.original.dueDate
-      return date ? format(new Date(date), "dd/MM/yyyy HH:mm") : "N/A"
+      return date ? format(new Date(date), "MM/dd/yyyy") : "N/A"
     },
   },
   {
@@ -89,19 +88,14 @@ export const column: ColumnDef<ColumnType>[] = [
     ),
     cell: ({ row }) => {
       const date = row.original.returnDate
-      return date ? format(new Date(date), "dd/MM/yyyy HH:mm") : "N/A"
+      return date ? format(new Date(date), "MM/dd/yyyy") : "N/A"
     },
   },
-  //   {
-  //     accessorKey: "createdAt",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Created At" />
-  //     ),
-  //     cell: ({ row }) => {
-  //       const date = row.original.createdAt
-  //       return date ? format(new Date(date), "dd/MM/yyyy HH:mm") : "N/A"
-  //     },
-  //   },
+  {
+    accessorKey: "id",
+    header: () => null,
+    cell: () => null,
+  },
   {
     id: "actions",
     cell: ({ row }) => {

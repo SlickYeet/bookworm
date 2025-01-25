@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn, getInitials } from "@/lib/utils"
 
 export function Header({ user }: { user: User }) {
@@ -47,6 +47,7 @@ export function Header({ user }: { user: User }) {
           <li>
             <Link href="/profile" className="flex items-center gap-2">
               <Avatar>
+                {user.pictureUrl ? <AvatarImage src={user.pictureUrl} /> : null}
                 <AvatarFallback className="bg-primary">
                   {getInitials(user?.fullName ?? "")}
                 </AvatarFallback>

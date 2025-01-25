@@ -38,8 +38,8 @@ async function main() {
       password,
       status: "APPROVED",
       role: "ADMIN",
-      universityId: 123123132,
-      studentId: "/seed/ids/student-id.jpg",
+      universityId: 123456789,
+      studentId: "/seed/ids/ID-Card.png?updatedAt=1737793855530",
     },
   })
 

@@ -16,9 +16,9 @@ import {
 const baseUrl =
   process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
-    : "https://demo.famlam.ca"
+    : "https://bookworm.famlam.ca"
 
-interface PasswordResetEmailProps {
+interface AccountStatusEmailProps {
   data: {
     name?: string
     message?: string
@@ -26,9 +26,9 @@ interface PasswordResetEmailProps {
   }
 }
 
-export const PasswordResetEmail = ({
+export const AccountStatusEmail = ({
   data: { name, message, status },
-}: PasswordResetEmailProps) => {
+}: AccountStatusEmailProps) => {
   const year = new Date().getFullYear()
 
   return (
@@ -68,7 +68,10 @@ export const PasswordResetEmail = ({
             <Section style={{ height: "30px" }} />
 
             <Section>
-              <Text style={messageText}>You are been {status} by an admin</Text>
+              <Text style={messageText}>
+                Your account has been <span style={statusText}>{status}</span>{" "}
+                by an admin
+              </Text>
             </Section>
 
             <Section style={{ height: "30px" }} />
@@ -171,16 +174,16 @@ export const PasswordResetEmail = ({
   )
 }
 
-PasswordResetEmail.PreviewProps = {
+AccountStatusEmail.PreviewProps = {
   data: {
     name: "SlickYeet",
     message:
       "This is an optional message the admin can leave for the user with instructions or a reason for the status change.",
     status: "REJECTED",
   },
-} as PasswordResetEmailProps
+} as AccountStatusEmailProps
 
-export default PasswordResetEmail
+export default AccountStatusEmail
 
 const fontFamily = "Inter,Inter,Arial,sans-serif"
 
@@ -222,6 +225,10 @@ const messageText = {
   textAlign: "center" as const,
 }
 
+const statusText = {
+  color: "#25388c",
+}
+
 const footer = {
   backgroundColor: "#f5f5f5",
   maxWidth: "580px",
@@ -249,6 +256,6 @@ const sectionBorder = {
 }
 
 const sectionCenter = {
-  borderBottom: "1px solid #2463eb",
+  borderBottom: "1px solid #E7C9A5",
   width: "102px",
 }

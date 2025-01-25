@@ -4,14 +4,21 @@ BookWorm is a book borrowing university library management solution.
 
 - [x] Migrate to Prisma
 - [ ] Remove RootLayout suppressHydrationWarning prop
-- [ ] Fetch all books from the database on the `LibraryPage`
+- [x] Fetch all books from the database on the `LibraryPage`
 - [ ] Get user borrowed books on the `ProfilePage`
-- [x] Make the `NewBooksPage` prettier
-- [ ] Implement the Books table and its functionalities on `BooksPage`
-- [ ] Add other admin pages _(WIP)_
+- [x] Make the all admin forms prettier
 - [ ] Display final summery on the left of admin forms
-- [ ] Admin Dashboard
+- [ ] Admin Dashboard (charts and stuff)
+- [ ] Implement all admin tables and their functionalities _(WIP)_
 - [ ] Implement loaned state in `BookCard`
-- [ ] Fix funky looking `Button` when no variant is applied
 - [ ] Define isBorrowed and isOverdue in `book` schema and its functionality
-- [ ] Render similar (using tags) books on `BooksPage`
+- [ ] Fix funky looking `Button` when no variant is applied
+- [ ] Show similar (using genre) books on `BooksPage`
+- [x] Fix broken search in `BorrowRecord` form
+- [x] Fix Due date calender not showing correct month in `BorrowRecord` form
+- [x] Fix redirect after submitting `BorrowRecord` form
+- [x] Remove replacing real data if its null
+- [ ] Find a better way to search for `BorrowRecords`
+- [x] OAuth implementation
+- [x] Email verification
+- [ ] Password reset

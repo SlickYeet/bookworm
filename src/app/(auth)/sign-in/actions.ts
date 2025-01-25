@@ -1,9 +1,11 @@
 "use server"
 
 import { compare } from "bcryptjs"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
+import { ratelimit } from "@/lib/ratelimit"
 import { db } from "@/server/db"
 import {
   createSession,
@@ -15,7 +17,11 @@ import { SignInSchema } from "@/validators"
 
 export async function signIn(
   values: z.infer<typeof SignInSchema>,
-): Promise<ReturnType<null>> {
+): Promise<ReturnType> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("too-fast")
+
   try {
     SignInSchema.parse(values)
   } catch {
@@ -37,18 +43,24 @@ export async function signIn(
     }
   }
 
-  const isPasswordValid = await compare(values.password, user.password)
-  if (!isPasswordValid) {
-    return {
-      success: false,
-      message: "Invalid email or password",
-      key: "invalid_password",
+  if (user.password !== null) {
+    const isPasswordValid = compare(values.password, user.password)
+    if (!isPasswordValid) {
+      return {
+        success: false,
+        message: "Invalid email or password",
+        key: "invalid_password",
+      }
     }
   }
 
   const sessionToken = generateSessionToken()
   const session = await createSession(sessionToken, user.id)
   setSessionTokenCookie(sessionToken, session.expiresAt)
+
+  if (user.status === "PENDING") {
+    return redirect("/verify-email")
+  }
 
   return redirect("/")
 }

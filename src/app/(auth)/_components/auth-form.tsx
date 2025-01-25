@@ -29,11 +29,13 @@ import { Input } from "@/components/ui/input"
 import { FIELD_DESCRIPTION, FIELD_LABELS, FIELD_TYPES } from "@/constants"
 import { ReturnType } from "@/types"
 
+import { OAthButton } from "./oauth-button"
+
 interface AuthFormProps<T extends FieldValues> {
   type: "SIGN_IN" | "SIGN_UP"
   schema: ZodType<T>
   defaultValues: T
-  onSubmit: (data: T) => Promise<ReturnType<null>>
+  onSubmit: (data: T) => Promise<ReturnType>
 }
 
 export function AuthForm<T extends FieldValues>({
@@ -88,8 +90,14 @@ export function AuthForm<T extends FieldValues>({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="w-full space-y-6"
+          className="mt-4 w-full space-y-6"
         >
+          <div className="flex justify-between gap-4">
+            <OAthButton provider="GOOGLE" />
+            <div className="w-px bg-primary" />
+            <OAthButton provider="GITHUB" />
+          </div>
+
           {Object.keys(defaultValues).map((field) => (
             <FormField
               key={field}

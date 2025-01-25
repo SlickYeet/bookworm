@@ -1,17 +1,33 @@
-import { BORROW_STATUS, STATUS } from "@prisma/client"
+import { ACCOUNT_PROVIDER, BORROW_STATUS, STATUS } from "@prisma/client"
 import { z } from "zod"
 
 export const SignUpSchema = z.object({
   fullName: z.string().min(3),
   email: z.string().email(),
-  universityId: z.coerce.number(),
-  studentId: z.string().nonempty("Student ID is required"),
-  password: z.string().min(8),
+  universityId: z.coerce.number().nullable(),
+  studentId: z.string().nullable(),
+  password: z.string().min(8).nullable(),
+  pictureUrl: z.string().optional(),
+  accountProvider: z.nativeEnum(ACCOUNT_PROVIDER).optional(),
+  oAuthId: z.coerce.string().optional(),
 })
 
 export const SignInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+  pictureUrl: z.string().optional(),
+  accountProvider: z.nativeEnum(ACCOUNT_PROVIDER).optional(),
+  oAuthId: z.coerce.string().optional(),
+})
+
+export const OAuthOnboardingSchema = z.object({
+  studentId: z.string(),
+  universityId: z.coerce.number(),
+})
+
+export const VerifyEmailSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
 })
 
 export const BookSchema = z.object({

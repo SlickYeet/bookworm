@@ -9,9 +9,14 @@ export default async function AuthLayout({
 }: {
   children: ReactNode
 }) {
-  const { session } = await getSession()
-  if (session) {
-    redirect("/")
+  const { session, user } = await getSession()
+  if (
+    session &&
+    user.status !== "PENDING" &&
+    user.universityId === null &&
+    user.studentId === null
+  ) {
+    return redirect("/")
   }
 
   return (

@@ -5,6 +5,11 @@ import { z } from "zod"
 
 import { checkEmailAvailability } from "@/server/email"
 import {
+  createEmailVerificationRequest,
+  sendVerificationEmail,
+  setEmailVerificationRequestCookie,
+} from "@/server/email-verification"
+import {
   createSession,
   generateSessionToken,
   setSessionTokenCookie,
@@ -15,7 +20,7 @@ import { SignUpSchema } from "@/validators"
 
 export async function signUp(
   values: z.infer<typeof SignUpSchema>,
-): Promise<ReturnType<null>> {
+): Promise<ReturnType> {
   const isEmailAvailable = await checkEmailAvailability(values.email)
   if (!isEmailAvailable) {
     return {
@@ -25,19 +30,22 @@ export async function signUp(
     }
   }
 
-  try {
-    const user = await createUser(values)
+  const user = await createUser(values)
 
-    const sessionToken = generateSessionToken()
-    const session = await createSession(sessionToken, user.id)
-    setSessionTokenCookie(sessionToken, session.expiresAt)
+  const emailVerification = await createEmailVerificationRequest(
+    user.id,
+    user.email,
+  )
+  sendVerificationEmail(
+    user.fullName,
+    emailVerification.email,
+    emailVerification.code,
+  )
+  setEmailVerificationRequestCookie(emailVerification)
 
-    return redirect("/")
-  } catch {
-    return {
-      success: false,
-      message: "Something went wrong, please try again.",
-      key: "unknown_error",
-    }
-  }
+  const sessionToken = generateSessionToken()
+  const session = await createSession(sessionToken, user.id)
+  setSessionTokenCookie(sessionToken, session.expiresAt)
+
+  return redirect("/verify-email")
 }

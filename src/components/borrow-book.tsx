@@ -56,9 +56,31 @@ export function BorrowBook({
 
         router.push("/profile")
       } else {
-        toast.error("Oops! Something went wrong.", {
-          description: result.message,
-        })
+        if (result.key === "account_not_approved") {
+          return toast.error("Oops!", {
+            description: "Your account is not approved yet.",
+            action: {
+              label: "Verify Email",
+              onClick: () => {
+                router.push("/verify-email")
+              },
+            },
+          })
+        } else if (result.key === "account_rejected") {
+          return toast.error("Oops!", {
+            description: "Your account has been rejected.",
+            action: {
+              label: "Contact Support",
+              onClick: () => {
+                router.push("https://lasse.famlam.ca#contact")
+              },
+            },
+          })
+        } else {
+          toast.error("Oops! Something went wrong.", {
+            description: result.message,
+          })
+        }
       }
     } catch {
       toast.error("Oops!", {

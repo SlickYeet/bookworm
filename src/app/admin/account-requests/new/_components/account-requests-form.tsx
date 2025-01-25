@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { manageAccountRequest } from "@/actions/book"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -41,10 +41,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn, getInitials } from "@/lib/utils"
 import { AccountRequestSchema } from "@/validators"
-
-// interface BookFormProps extends Partial<Book> {
-//   type?: "create" | "update"
-// }
 
 interface AccountRequestFormProps {
   users: User[]
@@ -81,6 +77,7 @@ export function AccountRequestForm({ users }: AccountRequestFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* userId */}
         <FormField
           control={form.control}
           name="userId"
@@ -123,6 +120,9 @@ export function AccountRequestForm({ users }: AccountRequestFormProps) {
                           className="flex cursor-pointer items-center gap-2"
                         >
                           <Avatar>
+                            {user.pictureUrl ? (
+                              <AvatarImage src={user.pictureUrl} />
+                            ) : null}
                             <AvatarFallback className="bg-amber-100">
                               {getInitials(user.fullName)}
                             </AvatarFallback>
@@ -154,6 +154,7 @@ export function AccountRequestForm({ users }: AccountRequestFormProps) {
             </FormItem>
           )}
         />
+        {/* status */}
         <FormField
           control={form.control}
           name="status"
@@ -182,6 +183,7 @@ export function AccountRequestForm({ users }: AccountRequestFormProps) {
             </FormItem>
           )}
         />
+        {/* message */}
         <FormField
           control={form.control}
           name="message"

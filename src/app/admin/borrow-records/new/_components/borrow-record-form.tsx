@@ -16,7 +16,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { borrowBook } from "@/actions/book"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -50,10 +50,6 @@ import {
 import { cn, getInitials } from "@/lib/utils"
 import { BorrowRecordSchema } from "@/validators"
 
-// interface BookFormProps extends Partial<Book> {
-//   type?: "create" | "update"
-// }
-
 interface BorrowRecordFormProps {
   users: User[]
   books: Book[]
@@ -81,7 +77,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
     if (result.success) {
       toast.success(result.message)
 
-      router.push("/admin/books")
+      router.push("/admin/borrow-records")
     } else {
       toast.error("Oops! Something went wrong.", {
         description: result.message,
@@ -92,6 +88,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* userId */}
         <FormField
           control={form.control}
           name="userId"
@@ -119,21 +116,24 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
                 <PopoverContent align="start" className="md:w-[42rem]">
                   <Command>
                     <CommandInput
-                      placeholder="Search for a book"
+                      placeholder="Search for a user"
                       className="h-9"
                     />
                     <CommandList>
-                      <CommandEmpty>No books found.</CommandEmpty>
+                      <CommandEmpty>No users found.</CommandEmpty>
                       {users.map((user) => (
                         <CommandItem
                           key={user.id}
-                          value={user.id}
+                          value={user.fullName}
                           onSelect={() => {
                             form.setValue("userId", user.id)
                           }}
                           className="flex cursor-pointer items-center gap-2"
                         >
                           <Avatar>
+                            {user.pictureUrl ? (
+                              <AvatarImage src={user.pictureUrl} />
+                            ) : null}
                             <AvatarFallback className="bg-amber-100">
                               {getInitials(user.fullName)}
                             </AvatarFallback>
@@ -165,6 +165,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
             </FormItem>
           )}
         />
+        {/* bookId */}
         <FormField
           control={form.control}
           name="bookId"
@@ -225,6 +226,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
             </FormItem>
           )}
         />
+        {/* status */}
         <FormField
           control={form.control}
           name="status"
@@ -254,6 +256,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
           )}
         />
         <div className="flex gap-8">
+          {/* borrowDate */}
           <FormField
             control={form.control}
             name="borrowDate"
@@ -297,6 +300,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
               </FormItem>
             )}
           />
+          {/* dueDate */}
           <FormField
             control={form.control}
             name="dueDate"
@@ -324,6 +328,53 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
+                      footer={
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            onClick={() =>
+                              form.setValue(
+                                "dueDate",
+                                dayjs(form.watch("borrowDate"))
+                                  .add(7, "day")
+                                  .toDate(),
+                              )
+                            }
+                            size="sm"
+                            variant="outline"
+                          >
+                            7 days
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              form.setValue(
+                                "dueDate",
+                                dayjs(form.watch("borrowDate"))
+                                  .add(14, "day")
+                                  .toDate(),
+                              )
+                            }
+                            size="sm"
+                            variant="outline"
+                          >
+                            14 days
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              form.setValue(
+                                "dueDate",
+                                dayjs(form.watch("borrowDate"))
+                                  .add(30, "day")
+                                  .toDate(),
+                              )
+                            }
+                            size="sm"
+                            variant="outline"
+                          >
+                            30 days
+                          </Button>
+                        </div>
+                      }
+                      defaultMonth={form.watch("dueDate") ?? new Date()}
                       selected={field.value ?? undefined}
                       onSelect={field.onChange}
                       disabled={(date) =>
@@ -342,6 +393,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
             )}
           />
         </div>
+        {/* returnDate */}
         <FormField
           control={form.control}
           name="returnDate"
@@ -375,7 +427,9 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
                     selected={field.value ?? undefined}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
+                      date <= (form.watch("borrowDate") ?? new Date()) ||
+                      date >= (form.watch("dueDate") ?? new Date()) ||
+                      date < new Date("1900-01-01")
                     }
                     initialFocus
                   />
@@ -392,7 +446,7 @@ export function BorrowRecordForm({ users, books }: BorrowRecordFormProps) {
           className="book-form_btn text-white"
         >
           {isLoading ? <Loader2 className="animate-spin" /> : null}
-          Add Book to Library
+          Add Borrow Record
         </Button>
       </form>
     </Form>

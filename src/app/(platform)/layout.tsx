@@ -23,17 +23,14 @@ export default async function PlatformLayout({
     const dbUser = await db.user.findUnique({
       where: { id: user.id },
     })
-    if (
-      dbUser?.lastActiveAt?.toISOString().slice(0, 10) ===
-      new Date().toISOString().slice(0, 10)
-    ) {
+    if (dbUser?.lastActiveAt === new Date()) {
       return
     }
 
     await db.user.update({
       where: { id: user.id },
       data: {
-        lastActiveAt: new Date().toISOString().slice(0, 10),
+        lastActiveAt: new Date(),
       },
     })
   })

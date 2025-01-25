@@ -41,7 +41,8 @@ export const FIELD_DESCRIPTION = {
   email: "Please use your university issued email",
   password:
     "Choose a strong password you can remember. (Must be at least 8 characters long)",
-  universityId: "Your University ID. See your student ID for this number",
+  universityId:
+    "Your University ID. Consult your university if you are unsure.",
 }
 
 export const FIELD_TYPES = {

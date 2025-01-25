@@ -5,8 +5,6 @@ import { IKVideo, ImageKitProvider } from "imagekitio-next"
 import { env } from "@/config"
 
 export function VideoPlayer({ videoUrl }: { videoUrl: string }) {
-  console.log("videoUrl", videoUrl)
-
   return (
     <ImageKitProvider
       urlEndpoint={env.imagekit.urlEndpoint}

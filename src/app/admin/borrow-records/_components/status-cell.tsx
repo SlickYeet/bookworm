@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { BORROW_STATUS, BorrowRecord } from "@prisma/client"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 
+import { updateBorrowRecord } from "@/actions/book"
 import { Form, FormControl, FormField } from "@/components/ui/form"
 import {
   Select,
@@ -12,8 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { BorrowRecordSchema } from "@/validators"
-import { updateBorrowRecord } from "@/actions/book"
-import { toast } from "sonner"
 
 export function StatusCell(borrowRecord: BorrowRecord) {
   const form = useForm<z.infer<typeof BorrowRecordSchema>>({
@@ -47,6 +47,12 @@ export function StatusCell(borrowRecord: BorrowRecord) {
             <Select
               onValueChange={(value) => {
                 field.onChange(value)
+                const returnDate = form.watch("returnDate")
+                if (value === BORROW_STATUS.RETURNED && !returnDate) {
+                  form.setValue("returnDate", new Date())
+                } else if (value === BORROW_STATUS.BORROWED) {
+                  form.setValue("returnDate", null)
+                }
                 form.handleSubmit(onSubmit)()
               }}
               value={field.value}
@@ -59,7 +65,15 @@ export function StatusCell(borrowRecord: BorrowRecord) {
               <SelectContent>
                 {Object.values(BORROW_STATUS).map((status) => (
                   <SelectItem key={status} value={status}>
-                    {status}
+                    <span
+                      className={
+                        status === BORROW_STATUS.RETURNED
+                          ? "text-green-600"
+                          : "text-orange-600"
+                      }
+                    >
+                      {status}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>

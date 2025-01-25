@@ -2,10 +2,12 @@
 
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -21,8 +23,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import { DataTableBulkActions } from "./bulk-actions"
 import { DataTablePagination } from "./pagination"
 import { DataTableViewOptions } from "./view-options"
+import { deleteBorrowRecord } from "@/app/admin/borrow-records/actions"
+import { DataTableSearchInput } from "./search-input"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -34,6 +39,9 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
@@ -45,10 +53,13 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
+      columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -57,7 +68,14 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="flex items-center py-4">
+        <DataTableSearchInput table={table} />
         <DataTableViewOptions table={table} />
+        <DataTableBulkActions
+          table={table}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
+          action={deleteBorrowRecord}
+        />
       </div>
       <div className="rounded-md border">
         <Table>

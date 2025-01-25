@@ -21,10 +21,6 @@ import { SignUpSchema } from "@/validators"
 
 import { adminCreateUser } from "./action"
 
-// interface UserFormProps extends Partial<Book> {
-//   type?: "create" | "update"
-// }
-
 export function UserForm() {
   const router = useRouter()
 
@@ -57,6 +53,7 @@ export function UserForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* fullName */}
         <FormField
           control={form.control}
           name="fullName"
@@ -77,6 +74,7 @@ export function UserForm() {
             </FormItem>
           )}
         />
+        {/* email */}
         <FormField
           control={form.control}
           name="email"
@@ -97,6 +95,7 @@ export function UserForm() {
             </FormItem>
           )}
         />
+        {/* password */}
         <FormField
           control={form.control}
           name="password"
@@ -111,6 +110,7 @@ export function UserForm() {
                   type="password"
                   placeholder="Enter the user's password"
                   {...field}
+                  value={field.value ?? ""}
                   className="book-form_input"
                 />
               </FormControl>
@@ -118,8 +118,8 @@ export function UserForm() {
             </FormItem>
           )}
         />
-
         <div className="flex gap-8">
+          {/* universityId */}
           <FormField
             control={form.control}
             name="universityId"
@@ -134,6 +134,7 @@ export function UserForm() {
                     type="number"
                     placeholder="Enter the user's university ID"
                     {...field}
+                    value={field.value ?? ""}
                     className="book-form_input"
                   />
                 </FormControl>
@@ -141,6 +142,7 @@ export function UserForm() {
               </FormItem>
             )}
           />
+          {/* studentId */}
           <FormField
             control={form.control}
             name="studentId"
@@ -154,6 +156,7 @@ export function UserForm() {
                     required
                     placeholder="Enter the user's student ID"
                     {...field}
+                    value={field.value ?? ""}
                     className="book-form_input"
                   />
                 </FormControl>

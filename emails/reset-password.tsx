@@ -16,7 +16,7 @@ import {
 const baseUrl =
   process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
-    : "https://demo.famlam.ca"
+    : "https://bookworm.famlam.ca"
 
 interface PasswordResetEmailProps {
   data: {
@@ -262,6 +262,6 @@ const sectionBorder = {
 }
 
 const sectionCenter = {
-  borderBottom: "1px solid #2463eb",
+  borderBottom: "1px solid #E7C9A5",
   width: "102px",
 }

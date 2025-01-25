@@ -23,17 +23,21 @@ model User {
     id String @id @default(uuid())
 
     fullName String
-    email    String @unique
-    password String
+    email    String  @unique
+    password String?
 
     status       STATUS   @default(PENDING)
     role         ROLE     @default(STUDENT)
+    pictureUrl   String?
     lastActiveAt DateTime @default(now())
 
-    universityId Int    @unique
-    studentId    String
+    universityId Int?
+    studentId    String? @unique
 
-    sessions Session[]
+    sessions          Session[]
+    accounts          Account[]
+    borrowedBooks     BorrowRecord[]
+    emailVerification EmailVerificationRequest[]
 
     createdAt DateTime @default(now())
 }
@@ -46,6 +50,40 @@ model Session {
 
     createdAt DateTime @default(now())
     expiresAt DateTime
+
+    @@index([userId])
+}
+
+model EmailVerificationRequest {
+    id String @id @default(cuid())
+
+    email String @unique
+    code  String
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    expiresAt DateTime
+
+    @@index([userId])
+}
+
+enum ACCOUNT_PROVIDER {
+    EMAIL
+    GOOGLE
+    GITHUB
+}
+
+model Account {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    oAuthId  String           @unique
+    provider ACCOUNT_PROVIDER
 
     @@index([userId])
 }
@@ -64,6 +102,8 @@ model Book {
     coverUrl   String
     videoUrl   String
 
+    borrowedBy BorrowRecord[]
+
     totalCopies     Int @default(1)
     availableCopies Int @default(0)
 
@@ -79,7 +119,10 @@ model BorrowRecord {
     id String @id @default(uuid())
 
     userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
     bookId String
+    book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
     status BORROW_STATUS @default(BORROWED)
 
@@ -88,4 +131,7 @@ model BorrowRecord {
     returnDate DateTime?
 
     createdAt DateTime @default(now())
+
+    @@index([userId])
+    @@index([bookId])
 }
