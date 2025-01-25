@@ -25,3 +25,4 @@ BookWorm is a book borrowing university library management solution.
 - [ ] Fix emails not sending (Ratelimiting?)
 - [ ] Add confetti to onboarding screen after finalizing profile
 - [ ] Verify google oauth
+- [ ] Send verification email during osuth call when a user exists, but is not verified
