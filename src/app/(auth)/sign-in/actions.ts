@@ -1,11 +1,9 @@
 "use server"
 
 import { compare } from "bcryptjs"
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
-import { ratelimit } from "@/lib/ratelimit"
 import { db } from "@/server/db"
 import {
   createSession,
@@ -18,10 +16,6 @@ import { SignInSchema } from "@/validators"
 export async function signIn(
   values: z.infer<typeof SignInSchema>,
 ): Promise<ReturnType> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   try {
     SignInSchema.parse(values)
   } catch {

@@ -1,16 +1,10 @@
 import { generateState } from "arctic"
-import { cookies, headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
-import { ratelimit } from "@/lib/ratelimit"
 import { github } from "@/server/oauth"
 
 export async function GET(): Promise<NextResponse> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   const state = generateState()
 
   const url = github.createAuthorizationURL(state, ["user:email"])

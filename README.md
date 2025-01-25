@@ -22,3 +22,6 @@ BookWorm is a book borrowing university library management solution.
 - [x] OAuth implementation
 - [x] Email verification
 - [ ] Password reset
+- [ ] Fix emails not sending (Ratelimiting?)
+- [ ] Add confetti to onboarding screen after finalizing profile
+- [ ] Verify google oauth

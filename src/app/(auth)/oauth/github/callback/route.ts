@@ -1,10 +1,8 @@
 import { ObjectParser } from "@pilcrowjs/object-parser"
 import { OAuth2Tokens } from "arctic"
-import { cookies, headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
-import { ratelimit } from "@/lib/ratelimit"
 import {
   createEmailVerificationRequest,
   sendVerificationEmail,
@@ -19,10 +17,6 @@ import {
 import { createUser, getUserFromOAuthId } from "@/server/user"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   const url = new URL(req.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")

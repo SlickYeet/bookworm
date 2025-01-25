@@ -21,10 +21,6 @@ import {
 export async function createBook(
   values: z.infer<typeof BookSchema>,
 ): Promise<ReturnType<Book>> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   try {
     const newBook = await db.book.create({
       data: {
@@ -56,7 +52,7 @@ export async function borrowBook(
 ): Promise<ReturnType<BorrowRecord>> {
   const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
   const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
+  if (!success) return redirect("/too-fast")
 
   const { user } = await getSession()
   if (user === null) {
@@ -153,10 +149,6 @@ export async function borrowBook(
 export async function updateBorrowRecord(
   values: z.infer<typeof BorrowRecordSchema>,
 ): Promise<ReturnType<BorrowRecord>> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   const existingRecord = await db.borrowRecord.findFirst({
     where: { userId: values.userId, bookId: values.bookId },
   })
@@ -187,10 +179,6 @@ export async function updateBorrowRecord(
 export async function manageAccountRequest(
   values: z.infer<typeof AccountRequestSchema>,
 ) {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   try {
     const { userId, status } = values
 

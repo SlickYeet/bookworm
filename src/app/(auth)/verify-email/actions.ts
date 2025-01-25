@@ -1,11 +1,9 @@
 "use server"
 
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { env } from "@/config"
-import { ratelimit } from "@/lib/ratelimit"
 import {
   createEmailVerificationRequest,
   deleteEmailVerificationRequestCookie,
@@ -23,10 +21,6 @@ import { VerifyEmailSchema } from "@/validators"
 export async function verifyEmail(
   values: z.infer<typeof VerifyEmailSchema>,
 ): Promise<ReturnType> {
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
-  const { success } = await ratelimit.limit(ip)
-  if (!success) return redirect("too-fast")
-
   const { session, user } = await getSession()
   if (session === null) {
     return {

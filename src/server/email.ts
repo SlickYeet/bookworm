@@ -2,9 +2,12 @@
 
 import { STATUS } from "@prisma/client"
 import { resend } from "@upstash/qstash"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 
 import { emailRenderer, EmailTemplates } from "@/components/email-renderer"
 import { env } from "@/config"
+import { ratelimit } from "@/lib/ratelimit"
 import { db } from "@/server/db"
 
 import { qStashClient } from "./workflow"
@@ -20,6 +23,10 @@ export async function sendEmail({
   template: EmailTemplates
   data: object
 }): Promise<void> {
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1"
+  const { success } = await ratelimit.limit(ip)
+  if (!success) return redirect("/too-fast")
+
   const body = await emailRenderer({ template, data })
   if (body === null) {
     throw new Error("Invalid email template")
